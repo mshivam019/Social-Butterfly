@@ -11,7 +11,7 @@ const useStyles = createStyles((theme, _params, getRef) => {
   const icon = getRef("icon");
   return {
     navbar: {
-      position: "sticky",
+      position: "fixed",
       backgroundColor:
         theme.colorScheme === "dark" ? theme.colors.dark[6] : theme.white,
     },
@@ -83,7 +83,7 @@ const useStyles = createStyles((theme, _params, getRef) => {
   };
 });
 
-const Navbar = ({ page, setPage }) => {
+const Navbar = ({ page, setPage,opened }) => {
   const { classes, cx } = useStyles();
 
   const links = linkData.map((item) => (
@@ -104,7 +104,7 @@ const Navbar = ({ page, setPage }) => {
   ));
 
   return (
-    <NavbarMT width={{ xs: 200, sm: 300 }} p="md" className={classes.navbar}>
+    <NavbarMT className={classes.navbar} p="md" hiddenBreakpoint="sm" hidden={!opened} width={{ sm: 200, lg: 300 }}>
       <NavbarMT.Section grow>{links}</NavbarMT.Section>
 
       <NavbarMT.Section className={classes.footer}>

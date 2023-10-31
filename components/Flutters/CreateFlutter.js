@@ -14,9 +14,6 @@ const useStyles = createStyles((theme) => ({
   },
   media: {
     width: "50vw",
-    [`@media (max-width: ${theme.breakpoints.lg}px)`]: {
-      width: "25vw",
-    },
   },
 }));
 

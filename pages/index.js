@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { useSetUser } from "../context/UserContext";
-import { AppShell, LoadingOverlay } from "@mantine/core";
+import { AppShell, LoadingOverlay} from "@mantine/core";
 import Navbar from "../components/Navbar/Navbar";
 import Flutters from "../components/Flutters/Flutters";
 import CreateFlutter from "../components/Flutters/CreateFlutter";
@@ -13,6 +13,7 @@ export default function Home() {
   const [flutters, setFlutters] = useState([]);
   const [page, setPage] = useState("Home");
   const setUser = useSetUser();
+  const [opened, setOpened] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -30,8 +31,8 @@ export default function Home() {
 
   return (
     <AppShell
-      header={<HeaderSearch setFlutters={setFlutters} />}
-      navbar={<Navbar page={page} setPage={setPage} />}
+      header={<HeaderSearch setFlutters={setFlutters} opened={opened} setOpened={setOpened}/> }
+      navbar={<Navbar page={page} setPage={setPage} opened={opened}/>}
       styles={(theme) => ({
         main: {
           backgroundColor:
@@ -40,6 +41,8 @@ export default function Home() {
               : theme.colors.gray[0],
         },
       })}
+      fixed
+      navbarOffsetBreakpoint="sm"
     >
       <LoadingOverlay visible={isLoading} />
       {page === "Home" && (
