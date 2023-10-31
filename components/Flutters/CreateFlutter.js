@@ -77,7 +77,7 @@ const CreateFlutter = ({ setFlutters }) => {
   };
 
   return (
-    <Group position={"center"} mt={10} mb={20}>
+    <Group position={"center"} mt={1} mb={20}>
       <Avatar src={user.picture} alt={user.name} radius="xl" />
       <form onSubmit={form.onSubmit((value) => onSubmitFlutter(value))}>
         <Group>
