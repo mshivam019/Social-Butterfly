@@ -96,6 +96,7 @@ const Navbar = ({ page, setPage,opened }) => {
       onClick={(event) => {
         event.preventDefault();
         setPage(item.label);
+        setOpened((o) => !o);
       }}
     >
       <item.icon className={classes.linkIcon} />

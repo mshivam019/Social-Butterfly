@@ -32,7 +32,7 @@ export default function Home() {
   return (
     <AppShell
       header={<HeaderSearch setFlutters={setFlutters} opened={opened} setOpened={setOpened}/> }
-      navbar={<Navbar page={page} setPage={setPage} opened={opened}/>}
+      navbar={<Navbar page={page} setPage={setPage} opened={opened} setOpened={setOpened}/>}
       styles={(theme) => ({
         main: {
           backgroundColor:
