@@ -83,7 +83,7 @@ const useStyles = createStyles((theme, _params, getRef) => {
   };
 });
 
-const Navbar = ({ page, setPage,opened }) => {
+const Navbar = ({ page, setPage,opened,setOpened }) => {
   const { classes, cx } = useStyles();
 
   const links = linkData.map((item) => (
