@@ -6,14 +6,17 @@ export default withApiAuthRequired(async function handler(req, res) {
 	try {
 		switch (req.method) {
 			case "GET":
+				await db.connect();
 				const flutters = await Flutter.find().sort({ postedAt: -1 });
 				res.status(200).json(flutters);
 				break;
 			case "POST":
+				await db.connect();
 				const pflutter = await Flutter.create(req.body);
 				res.status(200).json(pflutter);
 				break;
 			case "PUT":
+				await db.connect();
 				const puflutter = await Flutter.findByIdAndUpdate(
 					req.body._id,
 					req.body
@@ -21,6 +24,7 @@ export default withApiAuthRequired(async function handler(req, res) {
 				res.status(200).jsonpu(puflutter);
 				break;
 			case "DELETE":
+				await db.connect();
 				const dflutter = await Flutter.findByIdAndDelete(req.body._id);
 				res.status(200).json(dflutter);
 				break;
