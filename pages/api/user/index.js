@@ -1,100 +1,46 @@
-import {
-  getSession,
-  getAccessToken,
-  withApiAuthRequired,
-} from "@auth0/nextjs-auth0";
+import { getSession, withApiAuthRequired } from "@auth0/nextjs-auth0";
+import User from "../../../models/user";
+import db from "../../../utils/db";
 
 export default withApiAuthRequired(async function handler(req, res) {
-  try {
-    const { accessToken } = await getAccessToken(req, res);
-    const { user } = await getSession(req, res);
-
-    const baseUrl = `${process.env.MONGODB_DATA_API_URL}/action`;
-
-    switch (req.method) {
-      case "GET":
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        const readData = await fetch(`${baseUrl}/findOne`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Request-Headers": "*",
-            jwtTokenString: accessToken,
-          },
-          body: JSON.stringify({
-            dataSource: process.env.MONGODB_DATA_SOURCE,
-            database: "social_butterfly",
-            collection: "users",
-          }),
-        });
-
-        const readDataJson = await readData.json();
-        // console.log(readDataJson)
-
-        if (!readDataJson.document.email) {
-          await fetch(`${baseUrl}/updateOne`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Access-Control-Request-Headers": "*",
-              jwtTokenString: accessToken,
-            },
-            body: JSON.stringify({
-              dataSource: process.env.MONGODB_DATA_SOURCE,
-              database: "social_butterfly",
-              collection: "users",
-              filter: { _id: { $oid: readDataJson.document._id } },
-              update: {
-                $set: {
-                  email: user.email,
-                  name: user.name,
-                  picture: user.picture,
-                  nickname: user.nickname,
-                },
-              },
-            }),
-          });
-          readDataJson.document = {
-            ...readDataJson.document,
-            email: user.email,
-            name: user.name,
-            picture: user.picture,
-            nickname: user.nickname,
-          };
-        }
-
-        res.status(200).json(readDataJson.document);
-        break;
-      case "PUT":
-        const updateData = await fetch(`${baseUrl}/updateOne`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Request-Headers": "*",
-            jwtTokenString: accessToken,
-          },
-          body: JSON.stringify({
-            dataSource: process.env.MONGODB_DATA_SOURCE,
-            database: "social_butterfly",
-            collection: "users",
-            filter: { _id: { $oid: req.body._id } },
-            update: {
-              $set: {
-                nickname: req.body.nickname,
-                picture: req.body.picture,
-              },
-            },
-          }),
-        });
-        const updateDataJson = await updateData.json();
-        res.status(200).json(updateDataJson);
-        break;
-      default: //Method Not Allowed
-        res.status(405).end();
-        break;
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error });
-  }
+	try {
+		await db.connect();
+		const { user } = await getSession(req, res);
+		switch (req.method) {
+			case "GET":
+				const dbuser = await User.findOne({ email: user.email });
+				if (!dbuser) {
+					const newUser = new User({
+						id: user.sid,
+						email: user.email,
+						name: user.name,
+						picture: user.picture,
+						nickname: user.nickname,
+						data: {
+							sub: user.sub,
+						},
+					});
+					await newUser.save();
+					res.status(200).json(newUser);
+				} else {
+					res.status(200).json(dbuser);
+				}
+				break;
+			case "PUT":
+				const updatedUser = await User.findByIdAndUpdate(req.body._id, {
+					nickname: req.body.nickname,
+					picture: req.body.picture,
+				});
+				res.status(200).json(updatedUser);
+				break;
+			default:
+				res.status(405).json({ message: "Method not allowed" });
+				break;
+		}
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ error });
+	} finally {
+		await db.disconnect();
+	}
 });
